@@ -1,17 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PassIn.Communication.Responses;
+﻿using PassIn.Communication.Responses;
 using PassIn.Exceptions;
-using PassIn.Infrastructure;
+using PassIn.Infrastructure.Interfaces.Events;
 
 namespace PassIn.Application.UseCases.Events.GetById;
 
 public class GetEventByIdUseCase
 {
+    private readonly IEventRepository _eventRepository;
+    public GetEventByIdUseCase(IEventRepository eventRepository)
+    {
+        _eventRepository = eventRepository;
+    }
     public ResponseEventJson Execute(Guid id)
     {
-        var dbContext = new PassInDbContext();
-
-        var entity = dbContext.Events.Include(ev => ev.Attendees).FirstOrDefault(ev => ev.Id == id);
+        var entity = _eventRepository.GetEventById(id).Result;
 
         if (entity is null)
         {

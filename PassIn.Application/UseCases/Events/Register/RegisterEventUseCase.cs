@@ -3,16 +3,19 @@ using PassIn.Communication.Responses;
 using PassIn.Exceptions;
 using PassIn.Infrastructure;
 using PassIn.Infrastructure.Entities;
+using PassIn.Infrastructure.Interfaces.Events;
 
 namespace PassIn.Application.UseCases.Events.Register;
 public class RegisterEventUseCase
 {
+    private readonly IEventRepository _eventRepository;
+    public RegisterEventUseCase(IEventRepository eventRepository)
+    {
+        _eventRepository = eventRepository;
+    }
     public ResponseRegisteredJson Execute(RequestEventJson request)
     {
         Validate(request);
-
-        var dbContext = new PassInDbContext();
-
         var entity = new Infrastructure.Entities.Event
         {
             Title = request.Title,
@@ -22,8 +25,7 @@ public class RegisterEventUseCase
 
         };
 
-        dbContext.Events.Add(entity);
-        dbContext.SaveChanges();
+        _eventRepository.Add(entity);
 
         return new ResponseRegisteredJson
         {

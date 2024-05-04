@@ -5,6 +5,7 @@ using PassIn.Application.UseCases.Events.RegisterAttendee;
 using PassIn.Communication.Requests;
 using PassIn.Communication.Responses;
 using PassIn.Exceptions;
+using PassIn.Infrastructure.Interfaces.Events;
 
 namespace PassIn.Api.Controllers;
 
@@ -13,12 +14,17 @@ namespace PassIn.Api.Controllers;
 
 public class EventsController : ControllerBase
 {
+    private readonly IEventRepository _eventRepository;
+    public EventsController(IEventRepository eventRepository)
+    {
+        _eventRepository = eventRepository;
+    }
     [HttpPost]
     [ProducesResponseType(typeof(ResponseRegisteredJson), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
     public IActionResult Register([FromBody] RequestEventJson request)
     {
-        var useCase = new RegisterEventUseCase();
+        var useCase = new RegisterEventUseCase(_eventRepository);
 
         var response = useCase.Execute(request);
 
@@ -31,7 +37,7 @@ public class EventsController : ControllerBase
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
     public IActionResult GetById([FromRoute] Guid id)
     {
-        var useCase = new GetEventByIdUseCase();
+        var useCase = new GetEventByIdUseCase(_eventRepository);
 
         var response = useCase.Execute(id);
 

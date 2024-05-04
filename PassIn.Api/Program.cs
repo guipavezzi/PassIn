@@ -1,7 +1,6 @@
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using PassIn.Api.Filters;
-using PassIn.Communication.Requests;
+using PassIn.Infrastructure.Interfaces.Events;
+using PassIn.Infrastructure.Repositories.Events;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
+
+builder.Services.AddScoped<IEventRepository, EventRepository>();
 
 builder.Services.AddMvc(opt => opt.Filters.Add(typeof(ExceptionFilter)));
 
