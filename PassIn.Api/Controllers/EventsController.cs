@@ -42,6 +42,5 @@ public class EventsController : ControllerBase
         var response = useCase.Execute(id);
 
         return Ok(response);
-        
     }
 }

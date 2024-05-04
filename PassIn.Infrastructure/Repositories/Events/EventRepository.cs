@@ -18,7 +18,7 @@ namespace PassIn.Infrastructure.Repositories.Events
         }
         public async Task<Event> Add(Event entity)
         {
-            await _context.AddAsync(entity);
+            await _context.Events.AddAsync(entity);
             await _context.SaveChangesAsync();
             return entity;
         }

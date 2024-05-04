@@ -4,21 +4,22 @@ using PassIn.Communication.Responses;
 using PassIn.Exceptions;
 using PassIn.Infrastructure;
 using PassIn.Infrastructure.Entities;
+using PassIn.Infrastructure.Interfaces.Attendees;
 
-namespace PassIn.Application.UseCases.Events.RegisterAttendee;
+namespace PassIn.Application.UseCases.Attendees.RegisterAttendee;
 
 public class RegisterAttendeeOnEventUseCase
 {
-    private readonly PassInDbContext _dbContext;
-    public RegisterAttendeeOnEventUseCase()
+    private readonly IAttendeesRepository _attendeeRepository;
+    public RegisterAttendeeOnEventUseCase(IAttendeesRepository attendeeRepository)
     {
-        _dbContext = new PassInDbContext();
+        _attendeeRepository = attendeeRepository;
     }
     public ResponseRegisteredJson Execute(Guid eventId, RequestRegisterEventJson request)
     {
         Validate(eventId, request);
 
-        var entity = new Infrastructure.Entities.Attendee
+        var entity = new Attendee
         {
             Name = request.Name,
             Email = request.Email,
@@ -26,8 +27,7 @@ public class RegisterAttendeeOnEventUseCase
             Created_At = DateTime.UtcNow,
         };
 
-        _dbContext.Attendees.Add(entity);
-        _dbContext.SaveChanges();
+        _attendeeRepository.Add(entity);
 
         return new ResponseRegisteredJson
         {
