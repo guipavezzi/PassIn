@@ -5,12 +5,12 @@ namespace PassIn.Infrastructure
 {
     public class PassInDbContext : DbContext
     {
+        public PassInDbContext(DbContextOptions<PassInDbContext> opt) : base(opt)
+        {
+
+        }
         public DbSet<Event> Events { get; set; }
         public DbSet<Attendee> Attendees { get; set; }
         public DbSet<CheckIn> CheckIns { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data Source=C:\\Users\\guipa\\Downloads\\PassInDb (1).db");
-        }
     }
 }

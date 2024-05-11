@@ -8,10 +8,10 @@ namespace PassIn.Application.UseCases.Checkin.DoCheckIn;
 
 public class DoAttendeeCheckInUseCase
 {
-    private readonly PassInDbContext _dbContext;
-    public DoAttendeeCheckInUseCase()
+    private readonly PassInDbContext _context;
+    public DoAttendeeCheckInUseCase(PassInDbContext context)
     {
-        _dbContext = new PassInDbContext();
+        _context = context;
     }
     public ResponseRegisteredJson Execute(Guid attendeeId)
     {
@@ -23,8 +23,8 @@ public class DoAttendeeCheckInUseCase
             Created_at = DateTime.UtcNow,
         };
 
-        _dbContext.CheckIns.Add(entity);
-        _dbContext.SaveChanges();
+        _context.CheckIns.Add(entity);
+        _context.SaveChanges();
 
         return new ResponseRegisteredJson
         {
@@ -34,13 +34,13 @@ public class DoAttendeeCheckInUseCase
 
     private void Validate(Guid attendeeId)
     {
-        var existAttendee = _dbContext.Attendees.Any(attendee => attendee.Id == attendeeId);
+        var existAttendee = _context.Attendees.Any(attendee => attendee.Id == attendeeId);
         if (existAttendee == false)
         {
             throw new NotFoundException("The Attendee with this Id was not found.");
         }
 
-        var existCheckIn = _dbContext.CheckIns.Any(ch => ch.Attendee_id == attendeeId);
+        var existCheckIn = _context.CheckIns.Any(ch => ch.Attendee_id == attendeeId);
 
         if (existCheckIn)
         {

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PassIn.Application.UseCases.Attendees.GetAllByEventid;
-using PassIn.Application.UseCases.Events.RegisterAttendee;
+using PassIn.Application.UseCases.Attendees.RegisterAttendee;
 using PassIn.Communication.Requests;
 using PassIn.Communication.Responses;
+using PassIn.Infrastructure.Interfaces.Attendees;
+using PassIn.Infrastructure.Interfaces.Events;
 
 namespace PassIn.Api.Controllers;
 
@@ -10,6 +12,13 @@ namespace PassIn.Api.Controllers;
 [ApiController]
 public class AttendeesController : ControllerBase
 {
+    private readonly IEventRepository _eventRepository;
+    private readonly IAttendeesRepository _attendeesRepository;
+    public AttendeesController(IEventRepository eventRepository, IAttendeesRepository attendeesRepository)
+    {
+        _eventRepository = eventRepository;
+        _attendeesRepository = attendeesRepository;
+    }
     [HttpPost]
     [Route("{eventId}/register")]
     [ProducesResponseType(typeof(ResponseRegisteredJson), StatusCodes.Status201Created)]
@@ -18,7 +27,7 @@ public class AttendeesController : ControllerBase
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status409Conflict)]
     public IActionResult Register([FromRoute] Guid eventId, [FromBody] RequestRegisterEventJson request)
     {
-        var useCase = new RegisterAttendeeOnEventUseCase();
+        var useCase = new RegisterAttendeeOnEventUseCase(_attendeesRepository, _eventRepository);
 
         var response = useCase.Execute(eventId, request);
 
@@ -31,7 +40,7 @@ public class AttendeesController : ControllerBase
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
     public IActionResult GetAll([FromRoute] Guid eventId)
     {
-        var useCase = new GetAllAttendeesByEventIdUseCase();
+        var useCase = new GetAllAttendeesByEventIdUseCase(_eventRepository);
 
         var response = useCase.Execute(eventId);
 

@@ -5,15 +5,18 @@ using PassIn.Exceptions;
 using PassIn.Infrastructure;
 using PassIn.Infrastructure.Entities;
 using PassIn.Infrastructure.Interfaces.Attendees;
+using PassIn.Infrastructure.Interfaces.Events;
 
 namespace PassIn.Application.UseCases.Attendees.RegisterAttendee;
 
 public class RegisterAttendeeOnEventUseCase
 {
     private readonly IAttendeesRepository _attendeeRepository;
-    public RegisterAttendeeOnEventUseCase(IAttendeesRepository attendeeRepository)
+    private readonly IEventRepository _eventRepository;
+    public RegisterAttendeeOnEventUseCase(IAttendeesRepository attendeeRepository, IEventRepository eventRepository)
     {
         _attendeeRepository = attendeeRepository;
+        _eventRepository = eventRepository;
     }
     public ResponseRegisteredJson Execute(Guid eventId, RequestRegisterEventJson request)
     {
@@ -37,7 +40,7 @@ public class RegisterAttendeeOnEventUseCase
 
     private void Validate(Guid eventId, RequestRegisterEventJson request)
     {
-        var eventEntity = _dbContext.Events.Find(eventId);
+        var eventEntity = _eventRepository.GetEventById(eventId);
 
         if (eventEntity is null)
         {
@@ -55,19 +58,12 @@ public class RegisterAttendeeOnEventUseCase
             throw new ErrorOnValidationException("The e-mail is invalid.");
         }
 
-        var attendeeAlreadyReristered =
-            _dbContext.Attendees.Any(
-                attendee => attendee.Email.Equals(request.Email) && attendee.Event_Id == eventId
-            );
-
-        if (attendeeAlreadyReristered)
+        if (_attendeeRepository.ExistAttendeeInEvent(request.Email, eventEntity.Result.Id).Result)
         {
             throw new ErrorOnValidationException("You can not register twice on the same event.");
         }
 
-        var attendeesForEvent = _dbContext.Attendees.Count(attendee => attendee.Event_Id == eventId);
-
-        if (attendeesForEvent > eventEntity.Maximum_Attendees)
+        if (_attendeeRepository.AttendeesForEvent(eventId).Result > eventEntity.Result.Maximum_Attendees)
         {
             throw new ErrorOnValidationException("There is no room for this event.");
         }
