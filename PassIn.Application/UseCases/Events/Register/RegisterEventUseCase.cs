@@ -13,7 +13,7 @@ public class RegisterEventUseCase
     {
         _eventRepository = eventRepository;
     }
-    public ResponseRegisteredJson Execute(RequestEventJson request)
+    public async Task<ResponseRegisteredJson> Execute(RequestEventJson request)
     {
         Validate(request);
         var entity = new Infrastructure.Entities.Event
@@ -22,10 +22,9 @@ public class RegisterEventUseCase
             Details = request.Details,
             Maximum_Attendees = request.MaximumAttendees,
             Slug = request.Title.ToLower().Replace(" ", "-"),
-
         };
 
-        _eventRepository.Add(entity);
+        await _eventRepository.Add(entity);
 
         return new ResponseRegisteredJson
         {

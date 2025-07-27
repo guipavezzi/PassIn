@@ -7,5 +7,7 @@ namespace PassIn.Infrastructure.Interfaces.Attendees
         Task<Attendee> Add(Attendee entity);
         Task<bool> ExistAttendeeInEvent(string email, Guid idEvent);
         Task<int> AttendeesForEvent(Guid eventId);
+        Task<bool> ExistAttendee(Guid attendeeId);
+        
     }
 }

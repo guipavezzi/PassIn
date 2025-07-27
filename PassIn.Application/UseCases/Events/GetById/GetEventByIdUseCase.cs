@@ -11,9 +11,9 @@ public class GetEventByIdUseCase
     {
         _eventRepository = eventRepository;
     }
-    public ResponseEventJson Execute(Guid id)
+    public async Task<ResponseEventJson> Execute(Guid id)
     {
-        var entity = _eventRepository.GetEventById(id).Result;
+        var entity = await _eventRepository.GetEventById(id);
 
         if (entity is null)
         {

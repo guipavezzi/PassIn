@@ -25,11 +25,11 @@ public class AttendeesController : ControllerBase
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status409Conflict)]
-    public IActionResult Register([FromRoute] Guid eventId, [FromBody] RequestRegisterEventJson request)
+    public async Task<IActionResult> Register([FromRoute] Guid eventId, [FromBody] RequestRegisterEventJson request)
     {
         var useCase = new RegisterAttendeeOnEventUseCase(_attendeesRepository, _eventRepository);
 
-        var response = useCase.Execute(eventId, request);
+        var response = await useCase.Execute(eventId, request);
 
         return Created(string.Empty, response);
     }

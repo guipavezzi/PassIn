@@ -13,9 +13,18 @@ namespace PassIn.Infrastructure.Repositories.Events
         }
         public async Task<Event> Add(Event entity)
         {
-            await _context.Events.AddAsync(entity);
-            await _context.SaveChangesAsync();
-            return entity;
+            try
+            {
+                await _context.Events.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                return entity;    
+            }
+            catch (System.Exception e)
+            {
+                
+                throw new Exception(e.Message);
+            }
+            
         }
 
         public async Task<Event> GetAllAttendees(Guid eventId)

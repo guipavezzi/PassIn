@@ -18,7 +18,7 @@ public class RegisterAttendeeOnEventUseCase
         _attendeeRepository = attendeeRepository;
         _eventRepository = eventRepository;
     }
-    public ResponseRegisteredJson Execute(Guid eventId, RequestRegisterEventJson request)
+    public async Task<ResponseRegisteredJson> Execute(Guid eventId, RequestRegisterEventJson request)
     {
         Validate(eventId, request);
 
@@ -30,7 +30,7 @@ public class RegisterAttendeeOnEventUseCase
             Created_At = DateTime.UtcNow,
         };
 
-        _attendeeRepository.Add(entity);
+        await _attendeeRepository.Add(entity);
 
         return new ResponseRegisteredJson
         {

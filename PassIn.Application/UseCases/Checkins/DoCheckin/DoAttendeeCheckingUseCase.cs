@@ -3,28 +3,30 @@ using PassIn.Communication.Responses;
 using PassIn.Exceptions;
 using PassIn.Infrastructure;
 using PassIn.Infrastructure.Entities;
+using PassIn.Infrastructure.Interfaces.Attendees;
 
 namespace PassIn.Application.UseCases.Checkin.DoCheckIn;
 
 public class DoAttendeeCheckInUseCase
 {
-    private readonly PassInDbContext _context;
-    public DoAttendeeCheckInUseCase(PassInDbContext context)
+    private readonly ICheckinRepository _checkinRepository;
+    private readonly IAttendeesRepository _attendeesRepository;
+    public DoAttendeeCheckInUseCase(ICheckinRepository checkinRepository, IAttendeesRepository attendeesRepository)
     {
-        _context = context;
+        _checkinRepository = checkinRepository;
+        _attendeesRepository = attendeesRepository;
     }
-    public ResponseRegisteredJson Execute(Guid attendeeId)
+    public async Task<ResponseRegisteredJson> Execute(Guid attendeeId)
     {
-        Validate(attendeeId);
+        await Validate(attendeeId);
 
         var entity = new CheckIn
         {
-            Attendee_id = attendeeId,
+            AttendeeId = attendeeId,
             Created_at = DateTime.UtcNow,
         };
 
-        _context.CheckIns.Add(entity);
-        _context.SaveChanges();
+        await _checkinRepository.Add(entity);
 
         return new ResponseRegisteredJson
         {
@@ -32,15 +34,15 @@ public class DoAttendeeCheckInUseCase
         };
     }
 
-    private void Validate(Guid attendeeId)
+    private async Task Validate(Guid attendeeId)
     {
-        var existAttendee = _context.Attendees.Any(attendee => attendee.Id == attendeeId);
+        var existAttendee = await _attendeesRepository.ExistAttendee(attendeeId);
         if (existAttendee == false)
         {
             throw new NotFoundException("The Attendee with this Id was not found.");
         }
 
-        var existCheckIn = _context.CheckIns.Any(ch => ch.Attendee_id == attendeeId);
+        var existCheckIn = await _checkinRepository.ExistCheckin(attendeeId);
 
         if (existCheckIn)
         {

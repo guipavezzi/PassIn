@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using PassIn.Api.Filters;
 using PassIn.Infrastructure;
 using PassIn.Infrastructure.Interfaces.Attendees;
@@ -19,18 +18,16 @@ builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
 
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IAttendeesRepository, AttendeeRepository>();
+builder.Services.AddScoped<ICheckinRepository, CheckinRepository>();
 
 builder.Services.AddMvc(opt => opt.Filters.Add(typeof(ExceptionFilter)));
 builder.Services.AddDbContext<PassInDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionDb")));
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
 using PassIn.Infrastructure.Entities;
 using PassIn.Infrastructure.Interfaces.Attendees;
 using System;
@@ -33,6 +34,11 @@ namespace PassIn.Infrastructure.Repositories.Attendees
             return await _context.Attendees.AnyAsync(
                 attendee => attendee.Email.Equals(email) && attendee.Event_Id == idEvent
             );
+        }
+
+        public async Task<bool> ExistAttendee(Guid attendeeId)
+        {
+            return await _context.Attendees.AnyAsync(attendee => attendee.Id == attendeeId);
         }
     }
 }
